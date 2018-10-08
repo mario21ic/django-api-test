@@ -1,0 +1,31 @@
+version: '3.1'
+
+services:
+  api:
+    image: mario21ic/django:test
+    build:
+        context: ./
+    environment:
+      POSTGRES_PASSWORD: mypasswd
+    volumes:
+      - ./puppy_store/:/app/
+      - ./wait-for-it.sh/:/tmp/wait-for-it.sh
+    depends_on:
+      - "db"
+    command: ["/tmp/wait-for-it.sh", "db", "--", "python", "manage.py", "runserver", "0.0.0.0:8000"]
+    #    - python manage.py test -v 2
+    ports:
+      - 8000:8000
+
+  db:
+    image: postgres:9.4
+    restart: always
+    environment:
+      POSTGRES_DB: puppy_store_drf
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mypasswd
+    volumes:
+      - ./data/:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
